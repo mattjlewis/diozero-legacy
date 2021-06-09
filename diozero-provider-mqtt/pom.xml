@@ -1,28 +1,27 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<parent>
 		<groupId>com.diozero</groupId>
-		<artifactId>diozero-bom</artifactId>
-		<version>1.2.3</version>
+		<artifactId>diozero</artifactId>
+		<version>1.3.0</version>
 	</parent>
-
-	<name>Device I/O Zero - IMU Sample App</name>
-	<artifactId>diozero-imu-sampleapp</artifactId>
+	
+	<artifactId>diozero-provider-mqtt</artifactId>
 	<packaging>jar</packaging>
-
+	<name>diozero - MQTT Provider</name>
+	
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>com.diozero</groupId>
-				<artifactId>diozero-imu-devices</artifactId>
+				<artifactId>diozero-remote-common-messaging</artifactId>
 				<version>${diozero.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.diozero</groupId>
@@ -30,16 +29,15 @@
 		</dependency>
 		<dependency>
 			<groupId>com.diozero</groupId>
-			<artifactId>diozero-imu-devices</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
+			<artifactId>diozero-remote-common-messaging</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.paho</groupId>
 			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+		</dependency>
 	</dependencies>
-
 </project>

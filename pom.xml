@@ -8,7 +8,7 @@
     <groupId>com.diozero</groupId>
 	<artifactId>diozero-legacy</artifactId>
 	<packaging>pom</packaging>
-	<version>1.2.4</version>
+	<version>1.2.3</version>
 
 	<modules>
 		<module>diozero-imu</module>

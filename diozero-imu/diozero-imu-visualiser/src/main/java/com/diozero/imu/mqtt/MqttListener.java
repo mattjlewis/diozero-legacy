@@ -4,8 +4,8 @@ package com.diozero.imu.mqtt;
  * #%L
  * Organisation: diozero
  * Project:      Device I/O Zero - IMU Visualiser
- * Filename:     MqttListener.java  
- * 
+ * Filename:     MqttListener.java
+ *
  * This file is part of the diozero project. More information about this project
  * can be found at http://www.diozero.com/
  * %%
@@ -17,10 +17,10 @@ package com.diozero.imu.mqtt;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,7 +30,6 @@ package com.diozero.imu.mqtt;
  * THE SOFTWARE.
  * #L%
  */
-
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -43,7 +42,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import com.diozero.devices.imu.MqttConstants;
 import com.interactivemesh.jfx.importer.tds.TdsModelImporter;
 
 import javafx.application.Application;
@@ -74,7 +72,7 @@ public class MqttListener extends Application implements MqttCallback, MqttConst
 	private static final int QUAT_Z = 3;
 
 	private static String mqttServer;
-	
+
 	private MqttClient mqttClient;
 	private Shape3D testObject;
 	private AnchorPane root = new AnchorPane();
@@ -85,15 +83,15 @@ public class MqttListener extends Application implements MqttCallback, MqttConst
 				mqttServer = args[0].substring(MQTT_SERVER_OPTION.length() + 3);
 			}
 		}
-		
+
 		if (mqttServer == null) {
 			System.out.println("Error: Usage MqttListener --" + MQTT_SERVER_OPTION + "=<MQTT Server URL>");
 			System.exit(2);
 		}
-		
+
 		Application.launch(args);
 	}
-	
+
 	public MqttListener() {
 		try {
 			mqttClient = new MqttClient(mqttServer, MqttClient.generateClientId(), new MemoryPersistence());
@@ -115,7 +113,8 @@ public class MqttListener extends Application implements MqttCallback, MqttConst
 
 	@Override
 	public void deliveryComplete(IMqttDeliveryToken token) {
-		System.out.println("deliveryComplete(" + token.getMessageId() + ", " + Arrays.toString(token.getTopics()) + ")");
+		System.out
+				.println("deliveryComplete(" + token.getMessageId() + ", " + Arrays.toString(token.getTopics()) + ")");
 	}
 
 	@SuppressWarnings("boxing")
@@ -132,30 +131,36 @@ public class MqttListener extends Application implements MqttCallback, MqttConst
 		double x = quat[QUAT_X];
 		double y = quat[QUAT_Y];
 		double z = quat[QUAT_Z];
-		
-		System.out.format("Got IMU data: compass=[%f, %f, %f], accel=[%f, %f, %f], "
-				+ "gyro=[%f, %f, %f], quat=[%f, %f, %f, %f], ypr=[%f, %f, %f]%n",
-				compass[0], compass[1], compass[2], accel[0], accel[1], accel[2],
-				gyro[0], gyro[1], gyro[2], quat[0], quat[1], quat[2], quat[3], ypr[0], ypr[1], ypr[2]);
-		
-		//Rotate rx = new Rotate(Math.toDegrees(ypr[0]), Rotate.X_AXIS);
-		//Rotate ry = new Rotate(Math.toDegrees(ypr[1]), Rotate.Y_AXIS);
-		//Rotate rz = new Rotate(Math.toDegrees(ypr[2]), Rotate.Z_AXIS);
-		
-		double[] idt = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
+
+		System.out.format(
+				"Got IMU data: compass=[%f, %f, %f], accel=[%f, %f, %f], "
+						+ "gyro=[%f, %f, %f], quat=[%f, %f, %f, %f], ypr=[%f, %f, %f]%n",
+				compass[0], compass[1], compass[2], accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2], quat[0],
+				quat[1], quat[2], quat[3], ypr[0], ypr[1], ypr[2]);
+
+		// Rotate rx = new Rotate(Math.toDegrees(ypr[0]), Rotate.X_AXIS);
+		// Rotate ry = new Rotate(Math.toDegrees(ypr[1]), Rotate.Y_AXIS);
+		// Rotate rz = new Rotate(Math.toDegrees(ypr[2]), Rotate.Z_AXIS);
+
+		double[] idt = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 		Affine matrix = new Affine(idt, MatrixType.MT_3D_3x4, 0);
 		// http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q54
-		matrix.setMxx(1 - (2*y*y + 2*z*z));	matrix.setMxy(2*x*y + 2*z*w);		matrix.setMxz(2*x*z - 2*y*w);
-		matrix.setMyx(2*x*y - 2*z*w);		matrix.setMyy(1 - (2*x*x + 2*z*z));	matrix.setMyz(2*y*z + 2*x*w);
-		matrix.setMzx(2*x*z + 2*y*w);		matrix.setMzy(2*y*z - 2*x*w);		matrix.setMzz(1 - (2*x*x + 2*y*y));
-		
-		if (! Platform.isFxApplicationThread()) {
+		matrix.setMxx(1 - (2 * y * y + 2 * z * z));
+		matrix.setMxy(2 * x * y + 2 * z * w);
+		matrix.setMxz(2 * x * z - 2 * y * w);
+		matrix.setMyx(2 * x * y - 2 * z * w);
+		matrix.setMyy(1 - (2 * x * x + 2 * z * z));
+		matrix.setMyz(2 * y * z + 2 * x * w);
+		matrix.setMzx(2 * x * z + 2 * y * w);
+		matrix.setMzy(2 * y * z - 2 * x * w);
+		matrix.setMzz(1 - (2 * x * x + 2 * y * y));
+
+		if (!Platform.isFxApplicationThread()) {
 			Platform.runLater(() -> {
-					testObject.getTransforms().setAll(matrix);
-					//testObject.getTransforms().clear();
-					//testObject.getTransforms().addAll(rx, ry, rz);
-				}
-			);
+				testObject.getTransforms().setAll(matrix);
+				// testObject.getTransforms().clear();
+				// testObject.getTransforms().addAll(rx, ry, rz);
+			});
 		}
 	}
 
@@ -163,34 +168,32 @@ public class MqttListener extends Application implements MqttCallback, MqttConst
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setResizable(false);
 		Scene scene = new Scene(root, 1024, 800, true);
-		
+
 		// Create and position camera
 		Camera camera = new PerspectiveCamera();
-		camera.getTransforms().addAll(
-				new Rotate(0, Rotate.Y_AXIS),
-				new Rotate(0, Rotate.X_AXIS),
+		camera.getTransforms().addAll(new Rotate(0, Rotate.Y_AXIS), new Rotate(0, Rotate.X_AXIS),
 				new Translate(-500, -425, 1200));
 		scene.setCamera(camera);
 		scene.setFill(Paint.valueOf(Color.BLACK.toString()));
-		
+
 		// Box
 		testObject = new Cylinder(10, 50);
 		testObject.setMaterial(new PhongMaterial(Color.RED));
 		testObject.getTransforms().addAll(new Translate(50, 0, 0));
-		
+
 		TdsModelImporter model_importer = new TdsModelImporter();
 		model_importer.read(getClass().getResource("/models/SpaceLaunchSystem.3DS"));
 		Node[] nodes = model_importer.getImport();
 		model_importer.close();
 		Group rocket = new Group(nodes);
 		rocket.getTransforms().addAll(new Translate(0, 25, 0));
- 
+
 		// Build the Scene Graph
 		root.getChildren().addAll(testObject, rocket);
 
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		
+
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
@@ -200,7 +203,7 @@ public class MqttListener extends Application implements MqttCallback, MqttConst
 				}
 			}
 		});
-		
+
 		mqttClient.subscribe(MQTT_TOPIC_IMU + "/#");
 	}
 }
