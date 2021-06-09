@@ -1,0 +1,595 @@
+syntax = "proto3";
+
+option java_multiple_files = false;
+option java_package = "com.diozero.remote.message.protobuf";
+option java_outer_classname = "DiozeroProtos";
+
+package diozero;
+
+/*
+service GpioControl {
+  rpc GetBoardInfo (Gpio.GetBoardInfoRequest) returns (Gpio.GetBoardInfoResponse) {}
+  rpc ProvisionDigitalInputDevice (Gpio.ProvisionDigitalInputRequest) returns (Response) {}
+  rpc ProvisionDigitalOutputDevice (Gpio.ProvisionDigitalOutputRequest) returns (Response) {}
+  rpc ProvisionDigitalInputOutputDevice (Gpio.ProvisionDigitalInputOutputRequest) returns (Response) {}
+  rpc ProvisionDigitalPwmDevice (Gpio.ProvisionPwmOutputRequest) returns (Response) {}
+  rpc ProvisionAnalogInputDevice (Gpio.ProvisionAnalogInputRequest) returns (Response) {}
+  rpc ProvisionAnalogOutputDevice (Gpio.ProvisionAnalogOutputRequest) returns (Response) {}
+  rpc DigitalRead (Gpio.DigitalReadRequest) returns (Gpio.DigitalReadResponse) {}
+  rpc DigitalWrite (Gpio.DigitalWriteRequest) returns (Response) {}
+  rpc PwmRead (Gpio.PwmReadRequest) returns (Gpio.PwmReadResponse) {}
+  rpc PwmWrite (Gpio.PwmWriteRequest) returns (Response) {}
+  rpc GetPwmFrequency (Gpio.GetPwmFrequencyRequest) returns (Gpio.GetPwmFrequencyResponse) {}
+  rpc SetPwmFrequency (Gpio.SetPwmFrequencyRequest) returns (Response) {}
+  rpc AnalogRead (Gpio.AnalogReadRequest) returns (Gpio.AnalogReadResponse) {}
+  rpc AnalogWrite (Gpio.AnalogWriteRequest) returns (Response) {}
+  rpc Events (Gpio.EventsRequest) returns (Response) {}
+	rpc Subscribe (Gpio.SubscribeRequest) returns (stream Gpio.Notification) {}
+  rpc Close (Gpio.CloseRequest) returns (Response) {}
+}
+
+service I2CControl {
+	rpc Open (I2C.OpenRequest) returns (Response) {}
+	rpc Probe (I2C.ProbeRequest) returns (I2C.BooleanResponse) {}
+	rpc WriteQuick (I2C.WriteQuickRequest) returns (Response) {}
+	rpc ReadByte (I2C.ReadByteRequest) returns (I2C.ByteResponse) {}
+	rpc WriteByte (I2C.WriteByteRequest) returns (Response) {}
+	rpc ReadByteData (I2C.ReadByteDataRequest) returns (I2C.ByteResponse) {}
+	rpc WriteByteData (I2C.WriteByteDataRequest) returns (Response) {}
+	rpc ReadWordData (I2C.ReadWordDataRequest) returns (I2C.WordResponse) {}
+	rpc WriteWordData (I2C.WriteWordDataRequest) returns (Response) {}
+	rpc ProcessCall (I2C.ProcessCallRequest) returns (I2C.WordResponse) {}
+	rpc ReadBlockData (I2C.ReadBlockDataRequest) returns (I2C.ReadBlockDataResponse) {}
+	rpc WriteBlockData (I2C.WriteBlockDataRequest) returns (Response) {}
+	rpc BlockProcessCall (I2C.BlockProcessCallRequest) returns (I2C.BytesResponse) {}
+	rpc ReadI2CBlockData (I2C.ReadI2CBlockDataRequest) returns (I2C.BytesResponse) {}
+	rpc WriteI2CBlockData (I2C.WriteI2CBlockDataRequest) returns (Response) {}
+	rpc ReadBytes (I2C.ReadBytesRequest) returns (I2C.BytesResponse) {}
+	rpc WriteBytes (I2C.WriteBytesRequest) returns (Response) {}
+	rpc ReadWrite (I2C.ReadWriteRequest) returns (I2C.ReadWriteResponse) {}
+	rpc Close (I2C.CloseRequest) returns (Response) {}
+}
+
+service SPIControl {
+	rpc Open (SPI.OpenRequest) returns (Response) {}
+	rpc Write (SPI.WriteRequest) returns (Response) {}
+	rpc WriteAndRead (SPI.WriteAndReadRequest) returns (SPI.SpiResponse) {}
+	rpc Close (SPI.CloseRequest) returns (Response) {}
+}
+
+service SerialControl {
+	rpc Open (Serial.OpenRequest) returns (Response) {}
+	rpc Read (Serial.ReadRequest) returns (Serial.ReadResponse) {}
+	rpc ReadByte (Serial.ReadByteRequest) returns (Serial.ReadByteResponse) {}
+	rpc WriteByte (Serial.WriteByteRequest) returns (Response) {}
+	rpc ReadBytes (Serial.ReadBytesRequest) returns (Serial.ReadBytesResponse) {}
+	rpc WriteBytes (Serial.WriteBytesRequest) returns (Response) {}
+	rpc BytesAvailable (Serial.BytesAvailableRequest) returns (Serial.BytesAvailableResponse) {}
+	rpc Close (Serial.CloseRequest) returns (Response) {}
+}
+*/
+
+enum Status {
+	OK = 0;
+	ERROR = 1;
+}
+
+message MessageWrapper {
+	string type = 1;
+	bytes message = 2;
+}
+
+message Response {
+	string correlationId = 1;
+	Status status = 2;
+	string detail = 3;
+}
+
+message Gpio {
+	enum PullUpDown {
+		PUD_NONE = 0;
+		PUD_PULL_UP = 1;
+		PUD_PULL_DOWN = 2;
+	}
+	
+	enum Trigger {
+		TRIGGER_NONE = 0;
+		TRIGGER_RISING = 1;
+		TRIGGER_FALLING = 2;
+		TRIGGER_BOTH = 3;
+	}
+	
+	enum GpioMode {
+		DIGITAL_INPUT = 0;
+		DIGITAL_OUTPUT = 1;
+		PWM_OUTPUT = 2;
+		ANALOG_INPUT = 3;
+		ANALOG_OUTPUT = 4;
+		UNKNOWN = 5;
+	}
+	
+	message GpioInfo {
+	  string header = 1;
+		int32 physicalPin = 2;
+		int32 gpioNumber = 3;
+		int32 sysFsNumber = 4;
+		int32 chip = 5;
+		int32 lineOffset = 6;
+		string name = 7;
+		repeated GpioMode modes = 8;
+		optional int32 pwmNum = 9;
+	}
+	
+	message GetBoardInfoRequest {
+		string correlationId = 1;
+	}
+	
+	message GetBoardInfoResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		string make = 4;
+		string model = 5;
+		int32 memory = 6;
+		repeated GpioInfo gpioPins = 7;
+		repeated GpioInfo adcPins = 8;
+		repeated GpioInfo dacPins = 9;
+		float adcVref = 10;
+	}
+	
+	message ProvisionDigitalInputRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		PullUpDown pud = 3;
+		Trigger trigger = 4;
+	}
+	
+	message ProvisionDigitalOutputRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		bool initialValue = 3;
+	}
+	
+	message ProvisionDigitalInputOutputRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		bool output = 3;
+	}
+	
+	message ProvisionPwmOutputRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		int32 frequency = 3;
+		float initialValue = 4;
+	}
+	
+	message ProvisionAnalogInputRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+	}
+	
+	message ProvisionAnalogOutputRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		float initialValue = 3;
+	}
+	
+	message DigitalReadRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+	}
+	
+	message DigitalReadResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		bool value = 4;
+	}
+	
+	message DigitalWriteRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		bool value = 3;
+	}
+	
+	message PwmReadRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+	}
+	
+	message PwmReadResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		float value = 4;
+	}
+	
+	message PwmWriteRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		float value = 3;
+	}
+	
+	message GetPwmFrequencyRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+	}
+	
+	message GetPwmFrequencyResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		int32 frequency = 4;
+	}
+	
+	message SetPwmFrequencyRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		int32 frequency = 3;
+	}
+	
+	message AnalogReadRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+	}
+	
+	message AnalogReadResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		float value = 4;
+	}
+	
+	message AnalogWriteRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		float value = 3;
+	}
+	
+	message EventsRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+		bool enabled = 3;
+	}
+	
+	message SubscribeRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+	}
+	
+	message Notification {
+		int32 gpio = 1;
+		optional int64 epochTime = 2;
+		optional int64 nanoTime = 3;
+		optional bool value = 4;
+		optional Status status = 5;
+		optional string detail = 6;
+	}
+	
+	message CloseRequest {
+		string correlationId = 1;
+		int32 gpio = 2;
+	}
+}
+
+message I2C {
+  enum ProbeMode {
+  	QUICK = 0;
+  	READ = 1;
+  	AUTO = 2;
+  }
+  
+	message OpenRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 addressSize = 4;
+	}
+	
+	message ProbeRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		ProbeMode probeMode = 4;
+	}
+	
+	message WriteQuickRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 bit = 4;
+	}
+	
+	message ReadByteRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+	}
+	
+	message WriteByteRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 data = 4;
+	}
+	
+	message ReadByteDataRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+	}
+	
+	message WriteByteDataRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+		int32 data = 5;
+	}
+	
+	message ReadWordDataRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+	}
+	
+	message WriteWordDataRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+		int32 data = 5;
+	}
+	
+	message ProcessCallRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+		int32 data = 5;
+	}
+	
+	message ReadBlockDataRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+	}
+	
+	message WriteBlockDataRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+		bytes data = 5;
+	}
+	
+	message BlockProcessCallRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+		bytes data = 5;
+	}
+	
+	message ReadI2CBlockDataRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+		int32 length = 5;
+	}
+	
+	message WriteI2CBlockDataRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 register = 4;
+		bytes data = 5;
+	}
+	
+	message ReadBytesRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		int32 length = 4;
+	}
+	
+	message WriteBytesRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		bytes data = 4;
+	}
+
+	message I2CMessage {
+		int32 flags = 1;
+		int32 len = 2;
+	}
+	
+	message ReadWriteRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+		repeated I2CMessage messages = 4;
+		bytes data = 5;
+	}
+	
+	message CloseRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 address = 3;
+	}
+	
+	// I2C Responses
+	
+	message BooleanResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		bool result = 4;
+	}
+	
+	message ByteResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		int32 data = 4;
+	}
+	
+	message WordResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		int32 data = 4;
+	}
+	
+	message BytesResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		bytes data = 4;
+	}
+	
+	message ReadBlockDataResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		int32 bytesRead = 4;
+		bytes data = 5;
+	}
+	
+	message ReadWriteResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		bytes data = 4;
+	}
+}
+
+message SPI {
+	enum ClockMode {
+		MODE_0 = 0;
+		MODE_1 = 1;
+		MODE_2 = 2;
+		MODE_3 = 3;
+	}
+	
+	message OpenRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 chipSelect = 3;
+		int32 frequency = 4;
+		ClockMode clockMode = 5;
+		bool lsbFirst = 6;
+	}
+	
+	message WriteRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 chipSelect = 3;
+		bytes txData = 4;
+	}
+	
+	message WriteAndReadRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 chipSelect = 3;
+		bytes txData = 4;
+	}
+	
+	message CloseRequest {
+		string correlationId = 1;
+		int32 controller = 2;
+		int32 chipSelect = 3;
+	}
+	
+	message SpiResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		bytes rxData = 4;
+	}
+}
+
+message Serial {
+	message OpenRequest {
+		string correlationId = 1;
+		string deviceFile = 2;
+		int32 baud = 3;
+		int32 dataBits = 4;
+		int32 stopBits = 5;
+		int32 parity = 6;
+		bool readBlocking = 7;
+		int32 minReadChars = 8;
+		int32 readTimeoutMillis = 9;
+	}
+	
+	message ReadRequest {
+		string correlationId = 1;
+		string deviceFile = 2;
+	}
+	
+	message ReadByteRequest {
+		string correlationId = 1;
+		string deviceFile = 2;
+	}
+	
+	message WriteByteRequest {
+		string correlationId = 1;
+		string deviceFile = 2;
+		int32 data = 3;
+	}
+	
+	message ReadBytesRequest {
+		string correlationId = 1;
+		string deviceFile = 2;
+		int32 length = 3;
+	}
+	
+	message WriteBytesRequest {
+		string correlationId = 1;
+		string deviceFile = 2;
+		bytes data = 3;
+	}
+	
+	message BytesAvailableRequest {
+		string correlationId = 1;
+		string deviceFile = 2;
+	}
+
+	message CloseRequest {
+		string correlationId = 1;
+		string deviceFile = 2;
+	}
+	
+	message ReadResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		int32 data = 4;
+	}
+	
+	message ReadByteResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		int32 data = 4;
+	}
+	
+	message ReadBytesResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		bytes data = 4;
+	}
+	
+	message BytesAvailableResponse {
+		string correlationId = 1;
+		Status status = 2;
+		string detail = 3;
+		int32 bytesAvailable = 4;
+	}
+}

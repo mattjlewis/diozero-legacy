@@ -1,0 +1,2 @@
+		<!-- To build run: mvn install:install-file -Dfile=diozero-imu-visualiser/lib/jim3dsModelImporterJFX.jar -DgroupId=interactivemesh.org -DartifactId=3dsModelImporterJFX -Dversion=0.7 -Dpackaging=jar -->
+
